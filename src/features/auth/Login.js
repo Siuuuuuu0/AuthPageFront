@@ -56,6 +56,9 @@ const Login = () => {
     const handleUserInput = (e) => setUserOrMail(e.target.value)
     const handlePwdInput = (e) => setPassword(e.target.value)
     const handleToggle = () => setPersist(prev => !prev)
+    const handleGoogleLogin = () => {
+        window.location.href = 'http://localhost:3500/auth/google';
+    }
 
     const errClass = errMsg ? "errmsg" : "offscreen"
 
@@ -105,7 +108,11 @@ const Login = () => {
                         Trust This Device
                     </label>
                 </form>
+                <button className="form__submit-button" onClick={handleGoogleLogin}>
+                    Sign In with Google
+                </button>
             </main>
+            
             <footer>
                 <Link to="/">Back to Home</Link>
             </footer>

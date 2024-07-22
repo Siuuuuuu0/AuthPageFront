@@ -8,9 +8,7 @@ import { useRegisterMutation } from "./authApiSlice"
 
 //TODO : ADD NON_OPTIONAL CLASS FOR EMAIL AND PWD
 
-const USER_REGEX = /^[A-z]{3,20}$/
-const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/
-const EMAIL_REGEX = /^[A-z0-9]@[a-z].([a-z]{2,3})$/
+const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
 const Register = () => {
     useTitle('New User')
@@ -24,21 +22,9 @@ const Register = () => {
 
     const navigate = useNavigate()
 
-    const [username, setUsername] = useState('')
-    const [validUsername, setValidUsername] = useState(false)
-    const [password, setPassword] = useState('')
-    const [validPassword, setValidPassword] = useState(false)
     const [email, setEmail] = useState('')
     const [validEmail, setValidEmail] = useState(false)
     const [emailSent, setEmailSent] = useState(false) 
-
-    useEffect(() => {
-        setValidUsername(USER_REGEX.test(username))
-    }, [username])
-
-    useEffect(() => {
-        setValidPassword(PWD_REGEX.test(password))
-    }, [password])
 
     useEffect(() => {
         setValidEmail(EMAIL_REGEX.test(email))
@@ -47,29 +33,24 @@ const Register = () => {
 
     useEffect(() => {
         if (isSuccess) {
-            setUsername('')
-            setPassword('')
             setEmail('')
+            setValidEmail(false)
             setEmailSent(true)
         }
     }, [isSuccess, navigate])
 
-    const onUsernameChanged = e => setUsername(e.target.value)
-    const onPasswordChanged = e => setPassword(e.target.value)
     const onEmailChanged = e => setEmail(e.target.value)
 
-    const canSave = [(validUsername||username===''), validPassword, validEmail].every(Boolean) && !isLoading
+    const canSave = [validEmail].every(Boolean) && !isLoading
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault()
         if (canSave) {
-            await register({ username, password})
+            await register({email})
         }
     }
 
     const errClass = isError ? "errmsg" : "offscreen"
-    const validUserClass = !validUsername ? 'form__input--incomplete' : ''
-    const validPwdClass = !validPassword ? 'form__input--incomplete' : ''
     const validEmailClass = !validEmail ? 'form__input--incomplete' : ''
 
 
@@ -90,28 +71,6 @@ const Register = () => {
                         </button>
                     </div>
                 </div>
-                <label className="form__label" htmlFor="username">
-                    Username: <span className="nowrap">[3-20 letters]</span></label>
-                <input
-                    className={`form__input ${validUserClass}`}
-                    id="username"
-                    name="username"
-                    type="text"
-                    autoComplete="off"
-                    value={username}
-                    onChange={onUsernameChanged}
-                />
-
-                <label className="form__label" htmlFor="password">
-                    Password: <span className="nowrap">[4-12 chars incl. !@#$%]</span></label>
-                <input
-                    className={`form__input ${validPwdClass}`}
-                    id="password"
-                    name="password"
-                    type="password"
-                    value={password}
-                    onChange={onPasswordChanged}
-                />
 
                 <label className="form__label" htmlFor="email">
                     Email: <span className="nowrap">[Valid email]</span></label>

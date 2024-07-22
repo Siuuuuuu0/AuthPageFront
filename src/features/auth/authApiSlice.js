@@ -32,6 +32,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
             query: () => ({
                 url: '/auth/refresh',
                 method: 'GET',
+                
             }),
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
                 try {
@@ -58,6 +59,19 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 method : 'POST', 
                 body : { ...code }
             })
+        }), 
+        confirmRegister : builder.mutation({
+            query : ({token}) => ({
+                url : `/auth/register/confirm-registration?token=${token}`, 
+                method : 'POST'
+            }),
+        }), 
+        completeRegister : builder.mutation({
+            query: credentials => ({
+                url: '/auth/register/complete-registration',
+                method: 'POST',
+                body: { ...credentials }
+            })
         })
     })
 })
@@ -67,5 +81,7 @@ export const {
     useSendLogoutMutation,
     useRefreshMutation,
     useRegisterMutation, 
-    useConfirmCodeMutation
+    useConfirmCodeMutation, 
+    useConfirmRegisterMutation, 
+    useCompleteRegisterMutation
 } = authApiSlice 

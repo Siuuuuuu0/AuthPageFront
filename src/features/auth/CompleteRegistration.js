@@ -19,7 +19,8 @@ const CompleteRegister = () => {
     const [persist, setPersist] = usePersist()
 
     const dispatch = useDispatch()
-    const email = useSelector((state) => state.auth.userOrMail);
+    const email = useSelector((state) => state.auth.userOrMail)
+    const googleId = useSelector((state) => state.auth.googleId)
 
     const [completeRegister, {
         isLoading,
@@ -59,7 +60,7 @@ const CompleteRegister = () => {
         e.preventDefault()
         if (canSave) {
             try{
-            const {accessToken} = await completeRegister(username ? { email, password, username} : {email, password}).unwrap()
+            const {accessToken} = await completeRegister({ email, password, ...(username&&{username}), ...(googleId&&{googleId})} ).unwrap()
             console.log(accessToken)
             dispatch(setCredentials({ accessToken }))
             setPassword('')

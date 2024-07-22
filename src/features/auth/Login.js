@@ -1,11 +1,15 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { useLoginMutation } from './authApiSlice'
+import { useLoginMutation, useGoogleLoginMutation } from './authApiSlice'
 import usePersist from '../../hooks/usePersist'
 import useTitle from '../../hooks/useTitle'
 import PulseLoader from 'react-spinners/PulseLoader'
-import { setEmailOrUser } from './authSlice'
+import { setCredentials, setEmailOrUser, setGoogleId } from './authSlice'
+import { GoogleLogin } from '@react-oauth/google'
+import { jwtDecode } from 'jwt-decode'
+
+
 
 const Login = () => {
     useTitle('Login')
@@ -21,6 +25,7 @@ const Login = () => {
     const dispatch = useDispatch()
 
     const [login, { isLoading }] = useLoginMutation()
+    const [googleLogin] = useGoogleLoginMutation()
 
     useEffect(() => {
         userRef.current.focus()
@@ -56,9 +61,40 @@ const Login = () => {
     const handleUserInput = (e) => setUserOrMail(e.target.value)
     const handlePwdInput = (e) => setPassword(e.target.value)
     const handleToggle = () => setPersist(prev => !prev)
-    const handleGoogleLogin = () => {
-        window.location.href = 'http://localhost:3500/auth/google';
-    }
+    const handleGoogleLoginSuccess = async (response) => {
+        const userObject = jwtDecode(response.credential);
+        try {
+            const data = await googleLogin({
+                email: userObject.email,
+                name: userObject.name,
+                googleId: userObject.sub,
+            }).unwrap()
+
+            if(data.toRegister){
+                const {email, googleId} = data
+                dispatch(setEmailOrUser({userOrMail : email}))
+                dispatch(setGoogleId({googleId}))
+                navigate('/complete-register')
+            }
+            else if (data.accessToken){
+                const {accessToken} = data
+                // Assuming your backend responds with the user info and tokens
+                dispatch(setCredentials({accessToken}));
+                navigate('/dash'); // Redirect to the dashboard or appropriate route
+            }
+            else 
+                setErrMsg(data.message || 'Google login failed');
+            
+        } catch (err) {
+            console.log(err)
+            setErrMsg('Google login failed');
+        }
+    };
+
+    const handleGoogleLoginFailure = (error) => {
+        console.error('Google login failed:', error);
+        setErrMsg('Google login failed');
+    };
 
     const errClass = errMsg ? "errmsg" : "offscreen"
 
@@ -108,9 +144,13 @@ const Login = () => {
                         Trust This Device
                     </label>
                 </form>
-                <button className="form__submit-button" onClick={handleGoogleLogin}>
-                    Sign In with Google
-                </button>
+                <div>
+                    <GoogleLogin
+                        onSuccess={handleGoogleLoginSuccess}
+                        onError={handleGoogleLoginFailure}
+                    />
+                </div>
+
             </main>
             
             <footer>

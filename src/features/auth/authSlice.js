@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+//TODO : selectors for id and email
 
 const authSlice = createSlice({
     name: 'auth',
@@ -27,3 +28,5 @@ export const { setCredentials, logOut, setEmailOrUser, setGoogleId } = authSlice
 export default authSlice.reducer
 
 export const selectCurrentToken = (state) => state.auth.token
+export const selectCurrentGoogleId = (state) => state.auth.googleId
+export const selectCurrentUserOrMail = (state) => state.auth.userOrMail

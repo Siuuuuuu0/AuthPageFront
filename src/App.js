@@ -12,6 +12,7 @@ import Dash from './components/Dash'
 import ConfirmCode from './features/auth/ConfirmCode'
 import ConfirmRegistration from './features/auth/ConfirmRegistration'
 import CompleteRegister from './features/auth/CompleteRegistration'
+import UsersList from './features/users/UsersList'
 
 function App() {
   useTitle('Auth Page')
@@ -32,6 +33,7 @@ function App() {
           <Route element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}>
             <Route path="dash" element={<Dash />}>
               <Route index element={<Welcome />} />
+              <Route path="users" element={<UsersList />}/>
             </Route>{/* End Dash */}
           </Route>
         </Route>{/* End Protected Routes */}

@@ -54,7 +54,6 @@ const Login = () => {
             } else {
                 setErrMsg(err.data?.message);
             }
-            // errRef.current.focus();
         }
     }
 
@@ -69,6 +68,8 @@ const Login = () => {
                 name: userObject.name,
                 googleId: userObject.sub,
             }).unwrap()
+            setUserOrMail('')
+            setPassword('')
 
             if(data.toRegister){
                 const {email, googleId} = data
@@ -77,10 +78,10 @@ const Login = () => {
                 navigate('/complete-register')
             }
             else if (data.accessToken){
+                setPersist(true)
                 const {accessToken} = data
-                // Assuming your backend responds with the user info and tokens
                 dispatch(setCredentials({accessToken}));
-                navigate('/dash'); // Redirect to the dashboard or appropriate route
+                navigate('/dash'); 
             }
             else 
                 setErrMsg(data.message || 'Google login failed');

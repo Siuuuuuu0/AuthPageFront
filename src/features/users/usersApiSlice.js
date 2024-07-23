@@ -51,7 +51,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 method : 'PATCH', 
                 body : {
                     ...initialUserData
-                }
+                }, 
             }), 
             invalidatesTags : (result, error, arg)=>[
                 {type : 'User', id : arg.id}

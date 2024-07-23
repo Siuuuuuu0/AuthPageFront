@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faFileCirclePlus,
@@ -20,18 +20,20 @@ const Header = () => {
     // const { isManager, isAdmin } = useAuth()
 
     const navigate = useNavigate()
+
+    const [isLogoutSuccess, setIsLogoutSuccess] = useState(false)
     // const { pathname } = useLocation()
 
     const [sendLogout, {
         isLoading,
-        isSuccess,
         isError,
         error
     }] = useSendLogoutMutation()
 
     useEffect(() => {
-        if (isSuccess) navigate('/')
-    }, [isSuccess, navigate])
+        if (isLogoutSuccess)  
+            navigate('/')
+    }, [isLogoutSuccess, navigate])
 
     // const onNewNoteClicked = () => navigate('/dash/notes/new')
     // const onNewUserClicked = () => navigate('/dash/users/new')
@@ -101,7 +103,14 @@ const Header = () => {
         <button
             className="icon-button"
             title="Logout"
-            onClick={sendLogout}
+            onClick={() => {
+                try {
+                    sendLogout().unwrap()
+                    setIsLogoutSuccess(true)
+                }catch(err){
+
+                }
+            }}
         >
             <FontAwesomeIcon icon={faRightFromBracket} />
         </button>

@@ -8,6 +8,7 @@ import PulseLoader from 'react-spinners/PulseLoader'
 import { setCredentials, setEmailOrUser, setGoogleId } from './authSlice'
 import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
+import { setAccount } from '../account/accountSlice'
 
 
 
@@ -79,8 +80,9 @@ const Login = () => {
             }
             else if (data.accessToken){
                 setPersist(true)
-                const {accessToken} = data
+                const {accessToken, account} = data
                 dispatch(setCredentials({accessToken}));
+                dispatch(setAccount({account}))
                 navigate('/dash'); 
             }
             else 

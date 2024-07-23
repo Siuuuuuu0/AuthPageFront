@@ -14,6 +14,7 @@ import ConfirmRegistration from './features/auth/ConfirmRegistration'
 import CompleteRegister from './features/auth/CompleteRegistration'
 import UsersList from './features/users/UsersList'
 import EditUser from './features/users/EditUser'
+import Account from './features/account/Account'
 
 function App() {
   useTitle('Auth Page')
@@ -38,6 +39,7 @@ function App() {
                 <Route index element={<UsersList />}/>
                 <Route path=":id" element={<EditUser/>}/>
               </Route>
+              <Route path="settings" element={<Account/>}/>
             </Route>{/* End Dash */}
           </Route>
         </Route>{/* End Protected Routes */}

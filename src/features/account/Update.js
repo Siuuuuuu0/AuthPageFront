@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useConfirmUpdateEmailMutation, useConfirmUpdatePasswordMutation } from './accountApiSlice';
-import { setAccount } from './accountSlice';
 import { PulseLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { setCredentials } from '../auth/authSlice';
 
 const Update = () => {
     const dispatch = useDispatch();
@@ -23,13 +23,12 @@ const Update = () => {
     useEffect(() => {
         const update = async () => {
             try {
-                let data;
-
                 if (isEmailUpdate) {
-                    data = await updateEmail({ token }).unwrap();
-                    dispatch(setAccount(data));
+                    const{accessToken} = await updateEmail({ token }).unwrap();
+                    dispatch(setCredentials({accessToken}))
                 } else {
-                    data = await updatePassword({ token }).unwrap();
+                    const{accessToken} = await updatePassword({ token }).unwrap();
+                    dispatch(setCredentials({accessToken}))
                 }
 
                 navigate('/dash/settings');

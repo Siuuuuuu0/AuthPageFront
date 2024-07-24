@@ -1,12 +1,12 @@
 import React from 'react'
 import Settings from './Settings' 
-import { useSelector } from 'react-redux'
+import useAuth from '../../hooks/useAuth'
 
 const Account = () => {
 
-  const user = useSelector((state) => state.account.account)
+  const { username, email, id } = useAuth()
   
-  const content = <Settings user={user} /> 
+  const content = <Settings account={{username, email, id}} /> 
 
   return content
 }

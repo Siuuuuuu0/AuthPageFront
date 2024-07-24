@@ -7,7 +7,6 @@ import { useCompleteRegisterMutation } from "./authApiSlice"
 import { setCredentials } from './authSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import usePersist from "../../hooks/usePersist"
-import { setAccount } from "../account/accountSlice"
 
 //TODO : ADD NON_OPTIONAL CLASS FOR EMAIL AND PWD
 
@@ -61,10 +60,8 @@ const CompleteRegister = () => {
         e.preventDefault()
         if (canSave) {
             try{
-            const {accessToken, account} = await completeRegister({ email, password, ...(username&&{username}), ...(googleId&&{googleId})} ).unwrap()
-            console.log(accessToken)
+            const {accessToken} = await completeRegister({ email, password, ...(username&&{username}), ...(googleId&&{googleId})} ).unwrap()
             dispatch(setCredentials({ accessToken }))
-            dispatch(setAccount({account}))
             setPassword('')
             setUsername('')
             setValidUsername(false)

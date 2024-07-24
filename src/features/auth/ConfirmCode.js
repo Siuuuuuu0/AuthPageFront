@@ -4,7 +4,6 @@ import { setCredentials } from './authSlice'
 import { PulseLoader } from 'react-spinners'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, Link } from 'react-router-dom'
-import { setAccount } from '../account/accountSlice'
 
 const ConfirmCode = () => {
 
@@ -22,9 +21,8 @@ const ConfirmCode = () => {
 
     const handleSubmit = async(e) =>{
         try {
-            const { accessToken, account } = await confirm({code, userOrMail}).unwrap()
+            const { accessToken } = await confirm({code, userOrMail}).unwrap()
             dispatch(setCredentials({ accessToken }))
-            dispatch(setAccount({account}))
             setCode('')
             navigate('/dash')
         } catch (err) {

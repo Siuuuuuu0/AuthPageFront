@@ -8,7 +8,7 @@ const USER_REGEX = /^[A-z]{3,20}$/;
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;
 const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
-const Settings = ({ user }) => {
+const Settings = ({ account }) => {
     
     const [error, setError] = useState('');
     const [isError, setIsError] = useState('');
@@ -18,11 +18,11 @@ const Settings = ({ user }) => {
 
     const navigate = useNavigate();
 
-    const [username, setUsername] = useState(user.account.username);
+    const [username, setUsername] = useState(account.username);
     const [validUsername, setValidUsername] = useState(false);
     const [password, setPassword] = useState('');
     const [validPassword, setValidPassword] = useState(false);
-    const [email, setEmail] = useState(user.account.email);
+    const [email, setEmail] = useState(account.email);
     const [validEmail, setValidEmail] = useState(false);
     const [isSent, setIsSent] = useState(false)
 
@@ -44,7 +44,7 @@ const Settings = ({ user }) => {
 
     const onUpdateUsernameClicked = async () => {
         try {
-            await updateAccount({ id: user.account.id, toUpdate : {username} }).unwrap();
+            await updateAccount({ id: account.id, toUpdate : {username} }).unwrap();
         } catch (err) {
             console.log(err);
             setIsError(true);
@@ -54,7 +54,7 @@ const Settings = ({ user }) => {
 
     const onUpdatePasswordClicked = async () => {
         try {
-            await updateAccount({ id: user.account.id, toUpdate : {password} }).unwrap();
+            await updateAccount({ id: account.id, toUpdate : {password} }).unwrap();
             setIsSent(true);
         } catch (err) {
             console.log(err);
@@ -65,7 +65,7 @@ const Settings = ({ user }) => {
 
     const onUpdateEmailClicked = async () => {
         try {
-            await updateAccount({ id: user.account.id, toUpdate : {email} }).unwrap();
+            await updateAccount({ id: account.id, toUpdate : {email} }).unwrap();
             setIsSent(true);
         } catch (err) {
             console.log(err);
@@ -76,7 +76,7 @@ const Settings = ({ user }) => {
 
     const onDeleteAccountClicked = async () => {
         try {
-            await deleteAccount({ id: user.account.id}).unwrap();
+            await deleteAccount({ id: account.id}).unwrap();
             setEmail('')
             setPassword('')
             setUsername('')

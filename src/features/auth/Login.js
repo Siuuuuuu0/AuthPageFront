@@ -8,7 +8,6 @@ import PulseLoader from 'react-spinners/PulseLoader'
 import { setCredentials, setEmailOrUser, setGoogleId } from './authSlice'
 import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
-import { setAccount } from '../account/accountSlice'
 
 
 
@@ -80,9 +79,8 @@ const Login = () => {
             }
             else if (data.accessToken){
                 setPersist(true)
-                const {accessToken, account} = data
+                const {accessToken} = data
                 dispatch(setCredentials({accessToken}));
-                dispatch(setAccount({account}))
                 navigate('/dash'); 
             }
             else 
@@ -153,6 +151,8 @@ const Login = () => {
                         onError={handleGoogleLoginFailure}
                     />
                 </div>
+
+                <Link to="/reset">Reset password</Link>
 
             </main>
             

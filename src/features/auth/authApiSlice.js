@@ -79,6 +79,20 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 method : 'POST', 
                 body : { ...credentials} 
             })
+        }), 
+        resetPassword : builder.mutation({
+            query : credentials =>({
+                url : '/reset', 
+                method : 'POST', 
+                body : {...credentials}
+            })
+        }), 
+        confirmResetPassword : builder.mutation({
+            query : ({password, token}) => ({
+                url : `/reset/confirm?token=${token}`, 
+                method : 'POST', 
+                body : {...password}
+            })
         })
     })
 })
@@ -91,5 +105,7 @@ export const {
     useConfirmCodeMutation, 
     useConfirmRegisterMutation, 
     useCompleteRegisterMutation, 
-    useGoogleLoginMutation
+    useGoogleLoginMutation, 
+    useResetPasswordMutation, 
+    useConfirmResetPasswordMutation
 } = authApiSlice 

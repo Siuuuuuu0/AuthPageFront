@@ -1,4 +1,5 @@
 import { apiSlice } from "../../app/api/apiSlice";
+import { logOut } from "../auth/authSlice";
 import { setAccount } from "./accountSlice";
 
 export const accountApiSlice = apiSlice.injectEndpoints({
@@ -16,12 +17,16 @@ export const accountApiSlice = apiSlice.injectEndpoints({
             query: ({ id }) => ({
                 url: `/update`,
                 method: 'DELETE',
-                body : {...id}
+                body : {id}
             }),
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
                 try {
                     await queryFulfilled;
                     dispatch(setAccount(null));
+                    dispatch(logOut())
+                    setTimeout(() => {
+                        dispatch(apiSlice.util.resetApiState())
+                    }, 1000)
                 } catch (err) {
                     console.log(err);
                 }
@@ -43,13 +48,13 @@ export const accountApiSlice = apiSlice.injectEndpoints({
         }), 
         confirmUpdatePassword : builder.mutation({
             query : ({token}) => ({
-                url : `/update/update-password/:${token}`, 
+                url : `/update/update-password?token=${token}`, 
                 method : 'PATCH', 
             }),
         }), 
         confirmUpdateEmail : builder.mutation({
             query : ({token}) => ({
-                url : `/update/update-email/:${token}`, 
+                url : `/update/update-email?token=${token}`, 
                 method : 'PATCH', 
             })
         }), 

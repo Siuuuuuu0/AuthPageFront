@@ -1,19 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { useConfirmResetPasswordMutation } from './authApiSlice';
 import PulseLoader from 'react-spinners/PulseLoader';
+
+const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/
 
 const ConfirmReset = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     const token = new URLSearchParams(location.search).get('token');
     
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [validPassword, setValidPassword] = useState(false)
     const [errMsg, setErrMsg] = useState('');
-    const [isSent, setIsSent] = useState(false);
+
+    useEffect(() => {
+        setValidPassword(PWD_REGEX.test(password))
+    }, [password])
 
     const [confirmResetPassword, { isLoading }] = useConfirmResetPasswordMutation();
 
@@ -28,13 +32,13 @@ const ConfirmReset = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (password !== confirmPassword) {
+        if (password !== confirmPassword || !validPassword) {
             setErrMsg('Passwords do not match');
             return;
         }
         try {
+            console.log({token, password})
             await confirmResetPassword({ token, password }).unwrap();
-            setIsSent(true);
             setPassword('');
             setConfirmPassword('');
             navigate('/login');

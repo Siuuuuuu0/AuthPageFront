@@ -91,7 +91,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
             query : ({password, token}) => ({
                 url : `/reset/confirm?token=${token}`, 
                 method : 'POST', 
-                body : {...password}
+                body : {password}
             })
         })
     })

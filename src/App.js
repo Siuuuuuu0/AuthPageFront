@@ -17,6 +17,7 @@ import EditUser from './features/users/EditUser'
 import Account from './features/account/Account'
 import Update from './features/account/Update'
 import Reset from './features/auth/Reset'
+import ConfirmReset from './features/auth/ConfirmReset'
 
 function App() {
   useTitle('Auth Page')
@@ -32,6 +33,7 @@ function App() {
         <Route path = "confirm-register" element={<ConfirmRegistration/>}/>
         <Route path = "complete-register" element={<CompleteRegister/>}/>
         <Route path ="reset" element={<Reset/>}/>
+        <Route path ="confirm-reset" element={<ConfirmReset/>}/>
 
         {/* Protected Routes */}
         <Route element={<PersistLogin />}>

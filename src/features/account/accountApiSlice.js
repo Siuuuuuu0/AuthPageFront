@@ -10,15 +10,7 @@ export const accountApiSlice = apiSlice.injectEndpoints({
                 body: {
                     ...initialUserData
                 }
-            }),
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-                try {
-                    const { data } = await queryFulfilled;
-                    dispatch(setAccount(data));
-                } catch (err) {
-                    console.log(err);
-                }
-            }
+            })
         }),
         deleteAccount: builder.mutation({
             query: ({ id }) => ({
@@ -48,12 +40,26 @@ export const accountApiSlice = apiSlice.injectEndpoints({
                     console.log(err);
                 }
             }
-        })
+        }), 
+        confirmUpdatePassword : builder.mutation({
+            query : ({token}) => ({
+                url : `/update/update-password/:${token}`, 
+                method : 'PATCH', 
+            }),
+        }), 
+        confirmUpdateEmail : builder.mutation({
+            query : ({token}) => ({
+                url : `/update/update-email/:${token}`, 
+                method : 'PATCH', 
+            })
+        }), 
     })
 });
 
 export const {
     useUpdateAccountMutation,
     useDeleteAccountMutation,
-    useGetAccountQuery
+    useGetAccountQuery, 
+    useConfirmUpdatePasswordMutation, 
+    useConfirmUpdateEmailMutation
 } = accountApiSlice;

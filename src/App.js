@@ -15,6 +15,7 @@ import CompleteRegister from './features/auth/CompleteRegistration'
 import UsersList from './features/users/UsersList'
 import EditUser from './features/users/EditUser'
 import Account from './features/account/Account'
+import Update from './features/account/Update'
 
 function App() {
   useTitle('Auth Page')
@@ -40,6 +41,8 @@ function App() {
                 <Route path=":id" element={<EditUser/>}/>
               </Route>
               <Route path="settings" element={<Account/>}/>
+              <Route path="update-email" element={<Update/>}/>
+              <Route path="update-password" element={<Update/>}/>
             </Route>{/* End Dash */}
           </Route>
         </Route>{/* End Protected Routes */}

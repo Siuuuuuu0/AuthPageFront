@@ -9,7 +9,7 @@ const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;
 const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
 const Settings = ({ user }) => {
-    const [isSuccess, setIsSuccess] = useState(false);
+    
     const [error, setError] = useState('');
     const [isError, setIsError] = useState('');
 
@@ -18,11 +18,11 @@ const Settings = ({ user }) => {
 
     const navigate = useNavigate();
 
-    const [username, setUsername] = useState(user.username);
+    const [username, setUsername] = useState(user.account.username);
     const [validUsername, setValidUsername] = useState(false);
     const [password, setPassword] = useState('');
     const [validPassword, setValidPassword] = useState(false);
-    const [email, setEmail] = useState(user.email);
+    const [email, setEmail] = useState(user.account.email);
     const [validEmail, setValidEmail] = useState(false);
     const [isSent, setIsSent] = useState(false)
 
@@ -38,23 +38,13 @@ const Settings = ({ user }) => {
         setValidEmail(EMAIL_REGEX.test(email));
     }, [email]);
 
-    useEffect(() => {
-        if (isSuccess) {
-            setUsername('');
-            setPassword('');
-            setEmail('');
-        }
-    }, [isSuccess, navigate]);
-
     const onUsernameChanged = e => setUsername(e.target.value);
     const onPasswordChanged = e => setPassword(e.target.value);
     const onEmailChanged = e => setEmail(e.target.value);
 
     const onUpdateUsernameClicked = async () => {
         try {
-            await updateAccount({ id: user.id, username }).unwrap();
-            setIsSuccess(true);
-            setIsSent(true);
+            await updateAccount({ id: user.account.id, toUpdate : {username} }).unwrap();
         } catch (err) {
             console.log(err);
             setIsError(true);
@@ -64,9 +54,8 @@ const Settings = ({ user }) => {
 
     const onUpdatePasswordClicked = async () => {
         try {
-            await updateAccount({ id: user.id, password }).unwrap();
-            setIsSuccess(true);
-            navigate('/dash')
+            await updateAccount({ id: user.account.id, toUpdate : {password} }).unwrap();
+            setIsSent(true);
         } catch (err) {
             console.log(err);
             setIsError(true);
@@ -76,8 +65,7 @@ const Settings = ({ user }) => {
 
     const onUpdateEmailClicked = async () => {
         try {
-            await updateAccount({ id: user.id, email }).unwrap();
-            setIsSuccess(true);
+            await updateAccount({ id: user.account.id, toUpdate : {email} }).unwrap();
             setIsSent(true);
         } catch (err) {
             console.log(err);
@@ -88,8 +76,10 @@ const Settings = ({ user }) => {
 
     const onDeleteAccountClicked = async () => {
         try {
-            await deleteAccount({ id: user.id }).unwrap();
-            setIsSuccess(true);
+            await deleteAccount({ id: user.account.id}).unwrap();
+            setEmail('')
+            setPassword('')
+            setUsername('')
             navigate('/')
         } catch (err) {
             console.log(err);
@@ -149,7 +139,7 @@ const Settings = ({ user }) => {
                 </button>
 
                 <label className="form__label" htmlFor="password">
-                    Password: <span className="nowrap">[empty = no change]</span> <span className="nowrap">[4-12 chars incl. !@#$%]</span>
+                    Password: <span className="nowrap">[4-12 chars incl. !@#$%]</span>
                 </label>
                 <input
                     className={`form__input ${validPwdClass}`}

@@ -1,5 +1,4 @@
 import React from 'react'
-import { useLocation } from 'react-router-dom'
 import { SocialIcon } from 'react-social-icons'
 import { MdLocalPhone } from 'react-icons/md'
 import { IoMailOutline } from "react-icons/io5"

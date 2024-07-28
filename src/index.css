@@ -376,3 +376,20 @@ tr {
     position: static;
   }
 }
+
+.suggestions {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 300px;
+  margin-top: 10px;
+}
+
+.suggestion {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background-color: #f0f0f0;
+}
+

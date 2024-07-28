@@ -8,7 +8,7 @@ import { useRegisterMutation } from "./authApiSlice"
 
 //TODO : ADD NON_OPTIONAL CLASS FOR EMAIL AND PWD
 
-const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
 
 const Register = () => {
     useTitle('New User')

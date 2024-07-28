@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSave } from "@fortawesome/free-solid-svg-icons"
+import { faSave, faSyncAlt } from "@fortawesome/free-solid-svg-icons"
 import useTitle from "../../hooks/useTitle"
 import { useCompleteRegisterMutation } from "./authApiSlice"
 import { setCredentials } from './authSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import usePersist from "../../hooks/usePersist"
+import { useGetUsernamesMutation } from "../../app/api/usernameApiSlice"
 
 //TODO : ADD NON_OPTIONAL CLASS FOR EMAIL AND PWD
 
-const USER_REGEX = /^[A-z]{3,20}$/
+const USER_REGEX = /^[A-Za-z0-9!#$%^&*_\-.]{3,20}$/
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/
+const FIRSTNAME_REGEX =/^[A-Za-z]{3,40}$/
+const LASTNAME_REGEX =/^[A-Za-z]{3,40}$/
 
 const CompleteRegister = () => {
     useTitle('New User')
@@ -35,6 +38,14 @@ const CompleteRegister = () => {
     const [validUsername, setValidUsername] = useState(false)
     const [password, setPassword] = useState('')
     const [validPassword, setValidPassword] = useState(false)
+    const [firstName, setFirstName] = useState('')
+    const [validFirstName, setValidFirstName] = useState(false)
+    const [lastName, setLastName] = useState('')
+    const [validLastName, setValidLastName] = useState(false)
+    const [suggestedUsernames, setSuggestedUsernames] = useState([])
+    const [displayUsernames, setDisplayUsernames] = useState(false)
+    
+    const [getUsernames] = useGetUsernamesMutation()
 
     useEffect(() => {
         setValidUsername(USER_REGEX.test(username)||username==='')
@@ -43,30 +54,64 @@ const CompleteRegister = () => {
     useEffect(() => {
         setValidPassword(PWD_REGEX.test(password))
     }, [password])
+
+    useEffect(() => {
+        setValidFirstName(FIRSTNAME_REGEX.test(firstName))
+    }, [firstName])
+
+    useEffect(() => {
+        setValidLastName(LASTNAME_REGEX.test(lastName))
+    }, [lastName])
     
     useEffect(() => {
         if (isSuccess) {
             setUsername('')
             setPassword('')
+            setFirstName('')
+            setLastName('')
         }
     }, [isSuccess, navigate])
 
+    useEffect(()=> {
+        const fetchFunc = async() => {
+            if(validFirstName && validLastName) {
+                try{
+                    const {usernames} = await getUsernames({first_name : firstName, last_name : lastName}).unwrap()
+                    const usernameArray = Object.values(usernames)
+                    setSuggestedUsernames(usernameArray)
+                    setDisplayUsernames(true)
+                }catch(err){
+                    console.error(err)
+                }
+            }
+        }
+        fetchFunc()
+    }, [validFirstName, validLastName, firstName, lastName, getUsernames])
+
+
+
     const onUsernameChanged = e => setUsername(e.target.value)
     const onPasswordChanged = e => setPassword(e.target.value)
+    const onFirstNameChanged = e => setFirstName(e.target.value)
+    const onLastNameChanged = e => setLastName(e.target.value)
 
-    const canSave = [(validUsername||username===''), validPassword].every(Boolean) && !isLoading
+    const canSave = [(validUsername||username===''), validFirstName, validLastName, validPassword].every(Boolean) && !isLoading
 
     const onSaveUserClicked = async (e) => {
         e.preventDefault()
         if (canSave) {
             try{
-            const {accessToken} = await completeRegister({ email, password, ...(username&&{username}), ...(googleId&&{googleId})} ).unwrap()
-            dispatch(setCredentials({ accessToken }))
-            setPassword('')
-            setUsername('')
-            setValidUsername(false)
-            setValidPassword(false)
-            navigate('/dash')
+                const {accessToken} = await completeRegister({ email, password, ...(username&&{username}), ...(googleId&&{googleId})} ).unwrap()
+                dispatch(setCredentials({ accessToken }))
+                setPassword('')
+                setUsername('')
+                setFirstName('')
+                setLastName('')
+                setValidUsername(false)
+                setValidPassword(false)
+                setValidFirstName(false)
+                setValidLastName(false)
+                navigate('/dash')
             }catch(err){
                 console.log(err)
             }
@@ -75,10 +120,24 @@ const CompleteRegister = () => {
 
     const handleToggle = () => setPersist(prev => !prev)
 
+    const regenerateUsernames = async() => {
+        if(validFirstName && validLastName) {
+            try{
+                const {usernames} = await getUsernames({first_name : firstName, last_name : lastName}).unwrap()
+                const usernameArray = Object.values(usernames)
+                setSuggestedUsernames(usernameArray)
+                setDisplayUsernames(true)
+            }catch(err){
+                console.error(err)
+            }
+        }
+    }
+
     const errClass = isError ? "errmsg" : "offscreen"
     const validUserClass = !validUsername ? 'form__input--incomplete' : ''
     const validPwdClass = !validPassword ? 'form__input--incomplete' : ''
-
+    const validFirstNameClass = !validFirstName ? 'form__input--incomplete' : ''
+    const validLastNameClass = !validLastName ? 'form__input--incomplete' : ''
 
     const content = (
         <>
@@ -97,8 +156,56 @@ const CompleteRegister = () => {
                         </button>
                     </div>
                 </div>
+
                 <label className="form__label" htmlFor="username">
-                    Username: <span className="nowrap">[3-20 letters]</span></label>
+                    First Name: <span className="nowrap">[3-40 letters]</span></label>
+                <input
+                    className={`form__input ${validFirstNameClass}`}
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    autoComplete="off"
+                    value={firstName}
+                    onChange={onFirstNameChanged}
+                />
+
+                <label className="form__label" htmlFor="username">
+                    Last Name: <span className="nowrap">[3-40 letters]</span></label>
+                <input
+                    className={`form__input ${validLastNameClass}`}
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    autoComplete="off"
+                    value={lastName}
+                    onChange={onLastNameChanged}
+                />
+
+                {displayUsernames && (
+                    <>
+                        <div className="suggestions">
+                            {suggestedUsernames.map((suggestion, index) => (
+                                <div key={index} className="suggestion" onClick={() => setUsername(suggestion)}>
+                                    {suggestion}
+                                </div>
+                            ))}
+                        </div>
+                        <button
+                            type="button"
+                            className="icon-button"
+                            title="Reload"
+                            onClick={regenerateUsernames}
+                        >
+                            <FontAwesomeIcon icon={faSyncAlt} />
+                        </button>
+                    </>
+                )
+                }
+
+
+
+                <label className="form__label" htmlFor="username">
+                    Username: <span className="nowrap">[letters, numbers, special characters except @]</span></label>
                 <input
                     className={`form__input ${validUserClass}`}
                     id="username"

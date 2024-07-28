@@ -4,10 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons"
 import { ROLES } from "../../config/roles"
-
-const USER_REGEX = /^[A-z]{3,20}$/
-const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/
-const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from "../../config/regex"
 
 const EditUserForm = ({ user }) => {
 

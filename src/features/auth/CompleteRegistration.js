@@ -7,14 +7,10 @@ import { useCompleteRegisterMutation } from "./authApiSlice"
 import { setCredentials } from './authSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import usePersist from "../../hooks/usePersist"
-import { useGetUsernamesMutation } from "../../app/api/usernameApiSlice"
+import { useGetUsernamesMutation, useAddUsernameMutation } from "../../app/api/usernameApiSlice"
+import { USER_REGEX, PWD_REGEX, FIRSTNAME_REGEX, LASTNAME_REGEX} from "../../config/regex"
 
 //TODO : ADD NON_OPTIONAL CLASS FOR EMAIL AND PWD
-
-const USER_REGEX = /^[A-Za-z0-9!#$%^&*_\-.]{3,20}$/
-const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/
-const FIRSTNAME_REGEX =/^[A-Za-z]{3,40}$/
-const LASTNAME_REGEX =/^[A-Za-z]{3,40}$/
 
 const CompleteRegister = () => {
     useTitle('New User')
@@ -46,6 +42,7 @@ const CompleteRegister = () => {
     const [displayUsernames, setDisplayUsernames] = useState(false)
     
     const [getUsernames] = useGetUsernamesMutation()
+    const [addUsername] = useAddUsernameMutation()
 
     useEffect(() => {
         setValidUsername(USER_REGEX.test(username)||username==='')
@@ -101,8 +98,14 @@ const CompleteRegister = () => {
         e.preventDefault()
         if (canSave) {
             try{
-                const {accessToken} = await completeRegister({ email, password, ...(username&&{username}), ...(googleId&&{googleId})} ).unwrap()
+                const {accessToken} = await completeRegister({ email, password, ...(username&&{username}), ...(googleId&&{googleId}), firstName, lastName} ).unwrap()
                 dispatch(setCredentials({ accessToken }))
+                try{
+                    addUsername({username : username}).unwrap()
+                }
+                catch(err){
+                    console.error(err)  //do it on the backend
+                }
                 setPassword('')
                 setUsername('')
                 setFirstName('')
@@ -111,6 +114,7 @@ const CompleteRegister = () => {
                 setValidPassword(false)
                 setValidFirstName(false)
                 setValidLastName(false)
+                
                 navigate('/dash')
             }catch(err){
                 console.log(err)

@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import usePersist from "../../hooks/usePersist"
 import { useGetUsernamesMutation, useAddUsernameMutation } from "../../app/api/usernameApiSlice"
 import { USER_REGEX, PWD_REGEX, FIRSTNAME_REGEX, LASTNAME_REGEX} from "../../config/regex"
+import { useUploadProfilePictureMutation } from "../account/accountApiSlice"
 
 //TODO : ADD NON_OPTIONAL CLASS FOR EMAIL AND PWD
 
@@ -28,6 +29,8 @@ const CompleteRegister = () => {
         error
     }] = useCompleteRegisterMutation()
 
+    const [uploadProfilePicture] = useUploadProfilePictureMutation()
+
     const navigate = useNavigate()
 
     const [username, setUsername] = useState('')
@@ -40,6 +43,7 @@ const CompleteRegister = () => {
     const [validLastName, setValidLastName] = useState(false)
     const [suggestedUsernames, setSuggestedUsernames] = useState([])
     const [displayUsernames, setDisplayUsernames] = useState(false)
+    const [profilePicture, setProfilePicture] = useState(null)
     
     const [getUsernames] = useGetUsernamesMutation()
     const [addUsername] = useAddUsernameMutation()
@@ -91,6 +95,20 @@ const CompleteRegister = () => {
     const onPasswordChanged = e => setPassword(e.target.value)
     const onFirstNameChanged = e => setFirstName(e.target.value)
     const onLastNameChanged = e => setLastName(e.target.value)
+    const onProfilePictureChanged = e => setProfilePicture(e.target.files[0])
+
+    const uploadPP = async(id) => {
+        const formData = new FormData()
+        formData.append('id', id)
+        if (!profilePicture) return;
+        formData.append('profilePicture', profilePicture)
+        try {
+            await uploadProfilePicture(formData).unwrap()
+        }
+        catch(err){
+            console.error(err)
+        }
+    }
 
     const canSave = [(validUsername||username===''), validFirstName, validLastName, validPassword].every(Boolean) && !isLoading
 
@@ -98,14 +116,16 @@ const CompleteRegister = () => {
         e.preventDefault()
         if (canSave) {
             try{
-                const {accessToken} = await completeRegister({ email, password, ...(username&&{username}), ...(googleId&&{googleId}), firstName, lastName} ).unwrap()
+                const {accessToken, id} = await completeRegister({ email, password, ...(username&&{username}), ...(googleId&&{googleId}), firstName, lastName} ).unwrap()
                 dispatch(setCredentials({ accessToken }))
                 try{
-                    addUsername({username : username}).unwrap()
+                    await addUsername({username : username}).unwrap()
                 }
                 catch(err){
                     console.error(err)  //do it on the backend
                 }
+                uploadPP(id)
+                
                 setPassword('')
                 setUsername('')
                 setFirstName('')
@@ -230,6 +250,19 @@ const CompleteRegister = () => {
                     value={password}
                     onChange={onPasswordChanged}
                 />
+
+                <label className="form__label" htmlFor="profilePicture">
+                    Profile Picture:
+                </label>
+                <input
+                    className="form__input"
+                    id="profilePicture"
+                    name="profilePicture"
+                    type="file"
+                    accept="image/*"
+                    onChange={onProfilePictureChanged}
+                />
+
                 <label htmlFor="persist" className="form__persist">
                     <input
                         type="checkbox"

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useUpdateAccountMutation, useDeleteAccountMutation } from "./accountApiSlice";
+import { useUpdateAccountMutation, useDeleteAccountMutation, useDeleteProfilePictureMutation, useChangeProfilePictureMutation } from "./accountApiSlice";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +12,8 @@ const Settings = ({ account }) => {
 
     const [updateAccount, { isLoading }] = useUpdateAccountMutation();
     const [deleteAccount] = useDeleteAccountMutation();
+    const [deleteProfilePicture] = useDeleteProfilePictureMutation();
+    const [changeProfilePicture] = useChangeProfilePictureMutation();
 
     const navigate = useNavigate();
 
@@ -84,6 +86,15 @@ const Settings = ({ account }) => {
             setError(err);
         }
     };
+
+    const onDeletePPClicked = async () => {
+        try {
+            const data = await deleteProfilePicture({id : account.id}).unwrap()
+            console.log(data)
+        }catch(err){
+            console.error(err)
+        }
+    }
 
     const canSaveUsername = validUsername && !isLoading;
     const canSavePassword = validPassword && !isLoading;
@@ -173,6 +184,13 @@ const Settings = ({ account }) => {
                     disabled={!canSaveEmail}
                 >
                     <FontAwesomeIcon icon={faSave} />
+                </button>
+                <button
+                    className="icon-button"
+                    title="Delete Profile Picture"
+                    onClick={onDeletePPClicked}
+                >
+                    <FontAwesomeIcon icon={faTrashCan} />
                 </button>
             </form>
             {isSent && (<div>Email sent, please follow the link</div>)}

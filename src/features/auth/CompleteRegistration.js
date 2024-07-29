@@ -102,12 +102,7 @@ const CompleteRegister = () => {
         formData.append('id', id)
         if (!profilePicture) return;
         formData.append('profilePicture', profilePicture)
-        try {
-            await uploadProfilePicture(formData).unwrap()
-        }
-        catch(err){
-            console.error(err)
-        }
+        uploadProfilePicture(formData)
     }
 
     const canSave = [(validUsername||username===''), validFirstName, validLastName, validPassword].every(Boolean) && !isLoading

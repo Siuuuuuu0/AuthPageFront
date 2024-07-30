@@ -24,6 +24,7 @@ const Settings = ({ account }) => {
     const [email, setEmail] = useState(account.email);
     const [validEmail, setValidEmail] = useState(false);
     const [isSent, setIsSent] = useState(false)
+    const [profilePicture, setProfilePicture] = useState(null)
 
     useEffect(() => {
         setValidUsername(USER_REGEX.test(username));
@@ -40,6 +41,19 @@ const Settings = ({ account }) => {
     const onUsernameChanged = e => setUsername(e.target.value);
     const onPasswordChanged = e => setPassword(e.target.value);
     const onEmailChanged = e => setEmail(e.target.value);
+    const onProfilePictureChanged = e => setProfilePicture(e.target.files[0]);
+
+    const changePP = async(id) => {
+        if (!profilePicture) return;
+        const formData = new FormData()
+        formData.append('id', id)
+        formData.append('profilePicture', profilePicture)
+        changeProfilePicture(formData)
+    };
+
+    useEffect(() => {
+        changePP()
+    }, [profilePicture])
 
     const onUpdateUsernameClicked = async () => {
         try {
@@ -185,6 +199,17 @@ const Settings = ({ account }) => {
                 >
                     <FontAwesomeIcon icon={faSave} />
                 </button>
+                <label className="form__label" htmlFor="profilePicture">
+                    Profile Picture:
+                </label>
+                <input
+                    className="form__input"
+                    id="profilePicture"
+                    name="profilePicture"
+                    type="file"
+                    accept="image/*"
+                    onChange={onProfilePictureChanged}
+                />
                 <button
                     className="icon-button"
                     title="Delete Profile Picture"

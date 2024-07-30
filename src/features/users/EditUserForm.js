@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons"
 import { ROLES } from "../../config/roles"
 import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from "../../config/regex"
+import { useDeleteProfilePictureMutation } from "../account/accountApiSlice"
 
 const EditUserForm = ({ user }) => {
 
@@ -17,6 +18,7 @@ const EditUserForm = ({ user }) => {
     }] = useUpdateUserMutation()
 
     const [deleteUser] = useDeleteUserMutation()
+    const [deleteProfilePicture] = useDeleteProfilePictureMutation()
 
     const navigate = useNavigate()
 
@@ -87,6 +89,7 @@ const EditUserForm = ({ user }) => {
     const onDeleteUserClicked = async () => {
         try{
             await deleteUser({ id: user.id }).unwrap();
+            deleteProfilePicture({userId : user.id})
             setIsSuccess(true)
         }catch(err){
             console.log(err)

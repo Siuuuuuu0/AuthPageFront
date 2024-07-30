@@ -11,6 +11,8 @@ import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useSendLogoutMutation } from '../features/auth/authApiSlice'
 // import useAuth from '../hooks/useAuth'
 import PulseLoader from 'react-spinners/PulseLoader'
+import useProfilePicture, { setProfilePictureLS } from '../hooks/useProfilePicture'
+// import useProfilePicture from '../hooks/useProfilePicture'
 
 // const DASH_REGEX = /^\/dash(\/)?$/
 // const NOTES_REGEX = /^\/dash\/notes(\/)?$/
@@ -22,6 +24,8 @@ const Header = () => {
     const navigate = useNavigate()
 
     const [isLogoutSuccess, setIsLogoutSuccess] = useState(false)
+    const [profilePictureLS, setProfilePictureLS] = useProfilePicture()
+    // const {setProfilePictureLS} = useProfilePicture()
     // const { pathname } = useLocation()
 
     const [sendLogout, {
@@ -31,8 +35,10 @@ const Header = () => {
     }] = useSendLogoutMutation()
 
     useEffect(() => {
-        if (isLogoutSuccess)  
+        if (isLogoutSuccess)  {
+            setProfilePictureLS(null)
             navigate('/')
+        }
     }, [isLogoutSuccess, navigate])
 
     // const onNewNoteClicked = () => navigate('/dash/notes/new')

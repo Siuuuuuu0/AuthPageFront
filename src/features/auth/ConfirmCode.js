@@ -4,6 +4,8 @@ import { setCredentials } from './authSlice'
 import { PulseLoader } from 'react-spinners'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, Link } from 'react-router-dom'
+import { useGetProfilePictureMutation } from '../account/accountApiSlice'
+import useProfilePicture from '../../hooks/useProfilePicture'
 
 const ConfirmCode = () => {
 
@@ -16,13 +18,26 @@ const ConfirmCode = () => {
     const [errMsg, setErrMsg] = useState('')
 
     const [confirm,  { isLoading }] = useConfirmCodeMutation()
+    const [getProfilePicture] = useGetProfilePictureMutation()
+    const [profilePictureLS, setProfilePictureLS] = useProfilePicture()
 
     const userOrMail = useSelector((state) => state.auth.userOrMail);
 
+    const handleProfilePicture = async(userId) => {
+        try {
+            const {id, image} = await getProfilePicture({id : userId}).unwrap()
+            console.log({id, image})
+            setProfilePictureLS({id, image})
+        }catch(err){
+            // console.error(err)
+        }
+    }
+
     const handleSubmit = async(e) =>{
         try {
-            const { accessToken } = await confirm({code, userOrMail}).unwrap()
+            const { accessToken, id } = await confirm({code, userOrMail}).unwrap()
             dispatch(setCredentials({ accessToken }))
+            handleProfilePicture(id)
             setCode('')
             navigate('/dash')
         } catch (err) {

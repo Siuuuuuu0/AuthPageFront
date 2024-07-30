@@ -78,7 +78,14 @@ export const accountApiSlice = apiSlice.injectEndpoints({
                 method : 'POST', 
                 body : formData
             }) 
-        })
+        }), 
+        getProfilePicture : builder.mutation({
+            query: id => ({
+                url: '/account/get-profile-picture',
+                method: 'POST',
+                body : {...id}
+            }),
+        }),
     })
 });
 
@@ -90,5 +97,6 @@ export const {
     useConfirmUpdateEmailMutation, 
     useUploadProfilePictureMutation, 
     useDeleteProfilePictureMutation, 
-    useChangeProfilePictureMutation
+    useChangeProfilePictureMutation, 
+    useGetProfilePictureMutation
 } = accountApiSlice;

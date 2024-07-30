@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { useUpdateAccountMutation, useDeleteAccountMutation, useDeleteProfilePictureMutation, useChangeProfilePictureMutation } from "./accountApiSlice";
+import { useUpdateAccountMutation, useDeleteAccountMutation, useDeleteProfilePictureMutation, useChangeProfilePictureMutation, useUploadProfilePictureMutation } from "./accountApiSlice";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from "../../config/regex";
+import useProfilePicture from "../../hooks/useProfilePicture";
 
 const Settings = ({ account }) => {
     
@@ -14,6 +15,8 @@ const Settings = ({ account }) => {
     const [deleteAccount] = useDeleteAccountMutation();
     const [deleteProfilePicture] = useDeleteProfilePictureMutation();
     const [changeProfilePicture] = useChangeProfilePictureMutation();
+    const [uploadProfilePicture] = useUploadProfilePictureMutation();
+    const [profilePictureLS, setProfilePictureLS] = useProfilePicture()
 
     const navigate = useNavigate();
 
@@ -43,12 +46,18 @@ const Settings = ({ account }) => {
     const onEmailChanged = e => setEmail(e.target.value);
     const onProfilePictureChanged = e => setProfilePicture(e.target.files[0]);
 
-    const changePP = async(id) => {
+    const changePP = async() => {
         if (!profilePicture) return;
         const formData = new FormData()
-        formData.append('id', id)
+        formData.append('id', profilePictureLS ? profilePictureLS.id : account.id) 
         formData.append('profilePicture', profilePicture)
-        changeProfilePicture(formData)
+        try {
+             const {id, image} = profilePictureLS ? await changeProfilePicture(formData).unwrap() : await uploadProfilePicture(formData).unwrap()
+
+            setProfilePictureLS({id, image})
+        }catch(err){
+            console.error(err)
+        }
     };
 
     useEffect(() => {
@@ -89,7 +98,9 @@ const Settings = ({ account }) => {
 
     const onDeleteAccountClicked = async () => {
         try {
-            await deleteAccount({ id: account.id}).unwrap();
+            await deleteAccount({ id: account.id }).unwrap();
+            if(profilePictureLS) deleteProfilePicture({id : profilePictureLS.id})
+            setProfilePictureLS(null)
             setEmail('')
             setPassword('')
             setUsername('')
@@ -103,8 +114,9 @@ const Settings = ({ account }) => {
 
     const onDeletePPClicked = async () => {
         try {
-            const data = await deleteProfilePicture({id : account.id}).unwrap()
+            const data = await deleteProfilePicture({id : profilePictureLS.id}).unwrap()
             console.log(data)
+            setProfilePictureLS(null)
         }catch(err){
             console.error(err)
         }

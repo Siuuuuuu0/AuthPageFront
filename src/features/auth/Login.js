@@ -8,6 +8,9 @@ import PulseLoader from 'react-spinners/PulseLoader'
 import { setCredentials, setEmailOrUser, setGoogleId } from './authSlice'
 import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
+// import useProfilePicture from '../../hooks/useProfilePicture'
+import { useGetProfilePictureMutation } from '../account/accountApiSlice'
+import useProfilePicture from '../../hooks/useProfilePicture'
 
 
 
@@ -20,12 +23,14 @@ const Login = () => {
     const [password, setPassword] = useState('')
     const [errMsg, setErrMsg] = useState('')
     const [persist, setPersist] = usePersist()
+    const [profilePictureLS, setProfilePictureLS] = useProfilePicture()
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
     const [login, { isLoading }] = useLoginMutation()
     const [googleLogin] = useGoogleLoginMutation()
+    const [getProfilePicture] = useGetProfilePictureMutation()
 
     useEffect(() => {
         userRef.current.focus()
@@ -35,6 +40,15 @@ const Login = () => {
         setErrMsg('');
     }, [userOrMail, password])
 
+    const handleProfilePicture = async(userId) => {
+        try {
+            const {id, image} = await getProfilePicture({id : userId}).unwrap()
+            // console.log({id, image})
+            setProfilePictureLS({id, image})
+        }catch(err){
+            // console.error(err)
+        }
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -81,6 +95,7 @@ const Login = () => {
                 setPersist(true)
                 const {accessToken} = data
                 dispatch(setCredentials({accessToken}));
+                handleProfilePicture(data.id)
                 navigate('/dash'); 
             }
             else 

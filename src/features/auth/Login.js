@@ -10,7 +10,7 @@ import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
 // import useProfilePicture from '../../hooks/useProfilePicture'
 import { useGetProfilePictureMutation } from '../account/accountApiSlice'
-import useProfilePicture from '../../hooks/useProfilePicture'
+import { useProfilePicture } from '../../context/profilePictureContext'
 
 
 
@@ -23,7 +23,7 @@ const Login = () => {
     const [password, setPassword] = useState('')
     const [errMsg, setErrMsg] = useState('')
     const [persist, setPersist] = usePersist()
-    const [profilePictureLS, setProfilePictureLS] = useProfilePicture()
+    const {handleChange} = useProfilePicture()
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -44,7 +44,10 @@ const Login = () => {
         try {
             const {id, image} = await getProfilePicture({id : userId}).unwrap()
             // console.log({id, image})
-            setProfilePictureLS({id, image})
+            // const toStore = {id, image}
+            // console.log(toStore)
+            handleChange({id, image})
+            // console.log(profilePictureLS)
         }catch(err){
             // console.error(err)
         }

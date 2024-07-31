@@ -5,7 +5,7 @@ import { PulseLoader } from 'react-spinners'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, Link } from 'react-router-dom'
 import { useGetProfilePictureMutation } from '../account/accountApiSlice'
-import useProfilePicture from '../../hooks/useProfilePicture'
+import { useProfilePicture } from '../../context/profilePictureContext'
 
 const ConfirmCode = () => {
 
@@ -19,7 +19,7 @@ const ConfirmCode = () => {
 
     const [confirm,  { isLoading }] = useConfirmCodeMutation()
     const [getProfilePicture] = useGetProfilePictureMutation()
-    const [profilePictureLS, setProfilePictureLS] = useProfilePicture()
+    const {handleChange} = useProfilePicture()
 
     const userOrMail = useSelector((state) => state.auth.userOrMail);
 
@@ -27,7 +27,7 @@ const ConfirmCode = () => {
         try {
             const {id, image} = await getProfilePicture({id : userId}).unwrap()
             console.log({id, image})
-            setProfilePictureLS({id, image})
+            handleChange({id, image})
         }catch(err){
             // console.error(err)
         }

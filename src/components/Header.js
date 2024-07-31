@@ -11,7 +11,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useSendLogoutMutation } from '../features/auth/authApiSlice'
 // import useAuth from '../hooks/useAuth'
 import PulseLoader from 'react-spinners/PulseLoader'
-import useProfilePicture, { setProfilePictureLS } from '../hooks/useProfilePicture'
+import { useProfilePicture } from '../context/profilePictureContext'
 // import useProfilePicture from '../hooks/useProfilePicture'
 
 // const DASH_REGEX = /^\/dash(\/)?$/
@@ -24,7 +24,16 @@ const Header = () => {
     const navigate = useNavigate()
 
     const [isLogoutSuccess, setIsLogoutSuccess] = useState(false)
-    const [profilePictureLS, setProfilePictureLS] = useProfilePicture()
+    const {profilePictureLS, handleChange} = useProfilePicture()
+    const [imageSrc, setImageSrc] = useState("");
+
+    useEffect(() => {
+        // Retrieve the Base64 string from localStorage
+        if (profilePictureLS) {
+        setImageSrc(profilePictureLS.image);
+        }
+        else setImageSrc(null)
+    }, [profilePictureLS]);
     // const {setProfilePictureLS} = useProfilePicture()
     // const { pathname } = useLocation()
 
@@ -36,7 +45,7 @@ const Header = () => {
 
     useEffect(() => {
         if (isLogoutSuccess)  {
-            setProfilePictureLS(null)
+            handleChange(null)
             navigate('/')
         }
     }, [isLogoutSuccess, navigate])
@@ -148,6 +157,13 @@ const Header = () => {
                     <Link to="/dash">
                         <h1 className="dash-header__title">techNotes</h1>
                     </Link>
+
+                    {imageSrc ? (
+                        <img src={imageSrc} alt="Stored in localStorage" style={{width : '100px', height : 'auto'}}/>
+                    ) : (
+                        <p>No image</p>
+                    )}
+                    
                     <nav className="dash-header__nav">
                         {buttonContent}
                     </nav>

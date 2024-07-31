@@ -10,7 +10,7 @@ import usePersist from "../../hooks/usePersist"
 import { useGetUsernamesMutation, useAddUsernameMutation } from "../../app/api/usernameApiSlice"
 import { USER_REGEX, PWD_REGEX, FIRSTNAME_REGEX, LASTNAME_REGEX} from "../../config/regex"
 import { useUploadProfilePictureMutation } from "../account/accountApiSlice"
-import useProfilePicture from "../../hooks/useProfilePicture"
+import { useProfilePicture } from "../../context/profilePictureContext"
 // import useProfilePicture from "../../hooks/useProfilePicture"
 
 //TODO : ADD NON_OPTIONAL CLASS FOR EMAIL AND PWD
@@ -46,7 +46,7 @@ const CompleteRegister = () => {
     const [suggestedUsernames, setSuggestedUsernames] = useState([])
     const [displayUsernames, setDisplayUsernames] = useState(false)
     const [profilePicture, setProfilePicture] = useState(null)
-    const [profilePictureLS, setProfilePictureLS] = useProfilePicture()
+    const {handleChange} = useProfilePicture()
     
     const [getUsernames] = useGetUsernamesMutation()
     const [addUsername] = useAddUsernameMutation()
@@ -107,7 +107,7 @@ const CompleteRegister = () => {
         formData.append('profilePicture', profilePicture)
         try {
             const {id, image} = await uploadProfilePicture(formData).unwrap()
-            setProfilePictureLS({id, image})
+            handleChange({id, image})
         }catch(err){
             console.error(err)
         }

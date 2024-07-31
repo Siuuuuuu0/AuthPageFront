@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from "../../config/regex";
-import useProfilePicture from "../../hooks/useProfilePicture";
+import { useProfilePicture } from "../../context/profilePictureContext";
 
 const Settings = ({ account }) => {
     
@@ -16,7 +16,7 @@ const Settings = ({ account }) => {
     const [deleteProfilePicture] = useDeleteProfilePictureMutation();
     const [changeProfilePicture] = useChangeProfilePictureMutation();
     const [uploadProfilePicture] = useUploadProfilePictureMutation();
-    const [profilePictureLS, setProfilePictureLS] = useProfilePicture()
+    const {profilePictureLS, handleChange} = useProfilePicture()
 
     const navigate = useNavigate();
 
@@ -54,7 +54,7 @@ const Settings = ({ account }) => {
         try {
              const {id, image} = profilePictureLS ? await changeProfilePicture(formData).unwrap() : await uploadProfilePicture(formData).unwrap()
 
-            setProfilePictureLS({id, image})
+            handleChange({id, image})
         }catch(err){
             console.error(err)
         }
@@ -100,7 +100,7 @@ const Settings = ({ account }) => {
         try {
             await deleteAccount({ id: account.id }).unwrap();
             if(profilePictureLS) deleteProfilePicture({id : profilePictureLS.id})
-            setProfilePictureLS(null)
+            handleChange(null)
             setEmail('')
             setPassword('')
             setUsername('')
@@ -116,7 +116,7 @@ const Settings = ({ account }) => {
         try {
             const data = await deleteProfilePicture({id : profilePictureLS.id}).unwrap()
             console.log(data)
-            setProfilePictureLS(null)
+            handleChange(null)
         }catch(err){
             console.error(err)
         }
